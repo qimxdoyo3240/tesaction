@@ -20,19 +20,34 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Debug - show workspace
+      - name: Locate tesaction directory
+        id: locate
+        shell: bash
         run: |
-          echo "PWD=$(pwd)"
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          set -euo pipefail
+          echo "Workspace: $GITHUB_WORKSPACE"
+          echo "Top-level listing:"
           ls -la
-          find . -maxdepth 2 -type d -name "tesaction" -print
 
-      - name: Run bash in tesaction
-        working-directory: tesaction
+          # Cari folder bernama persis "tesaction" (case-sensitive) max depth 4
+          DIR="$(find . -maxdepth 4 -type d -name 'tesaction' -print -quit)"
+          if [ -z "${DIR}" ]; then
+            echo "ERROR: folder 'tesaction' tidak ditemukan."
+            echo "Daftar folder (depth 2):"
+            find . -maxdepth 2 -type d -print
+            exit 1
+          fi
+
+          echo "Found tesaction at: $DIR"
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Run bash inside tesaction
+        shell: bash
         run: |
+          set -euo pipefail
+          cd "${{ steps.locate.outputs.dir }}"
+          echo "Running in: $(pwd)"
           ls -la
           chmod u+x bash
           ./bash --noTest
