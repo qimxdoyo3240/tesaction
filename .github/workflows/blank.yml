@@ -1,0 +1,32 @@
+name: Run tesaction bash
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Jalan setiap 12 jam (UTC)
+    - cron: "0 */12 * * *"
+
+permissions:
+  contents: read
+
+# Mencegah overlap jika run sebelumnya masih berjalan
+concurrency:
+  group: tesaction-run
+  cancel-in-progress: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    # Batas keras 5 jam (300 menit)
+    timeout-minutes: 300
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run bash in tesaction
+        run: |
+          cd tesaction
+          chmod u+x bash
+          ./bash --noTest
