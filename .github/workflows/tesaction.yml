@@ -1,0 +1,38 @@
+name: Run tesaction bash
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */12 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tesaction-run
+  cancel-in-progress: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Debug - show workspace
+        run: |
+          echo "PWD=$(pwd)"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          ls -la
+          find . -maxdepth 2 -type d -name "tesaction" -print
+
+      - name: Run bash in tesaction
+        working-directory: tesaction
+        run: |
+          ls -la
+          chmod u+x bash
+          ./bash --noTest
