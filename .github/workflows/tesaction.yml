@@ -1,9 +1,9 @@
-name: Run tesaction bash
+name: Run bash --noTest
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "0 */12 * * *"  # tiap 12 jam (UTC)
 
 permissions:
   contents: read
@@ -15,39 +15,18 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 300  # 5 jam
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Locate tesaction directory
-        id: locate
-        shell: bash
+      - name: Debug (optional)
         run: |
-          set -euo pipefail
-          echo "Workspace: $GITHUB_WORKSPACE"
-          echo "Top-level listing:"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           ls -la
 
-          # Cari folder bernama persis "tesaction" (case-sensitive) max depth 4
-          DIR="$(find . -maxdepth 4 -type d -name 'tesaction' -print -quit)"
-          if [ -z "${DIR}" ]; then
-            echo "ERROR: folder 'tesaction' tidak ditemukan."
-            echo "Daftar folder (depth 2):"
-            find . -maxdepth 2 -type d -print
-            exit 1
-          fi
-
-          echo "Found tesaction at: $DIR"
-          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
-
-      - name: Run bash inside tesaction
-        shell: bash
+      - name: Run bash
         run: |
-          set -euo pipefail
-          cd "${{ steps.locate.outputs.dir }}"
-          echo "Running in: $(pwd)"
-          ls -la
-          chmod u+x bash
+          chmod u+x ./bash
           ./bash --noTest
