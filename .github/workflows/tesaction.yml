@@ -3,7 +3,7 @@ name: Run bash --noTest
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */12 * * *"  # tiap 12 jam (UTC)
+    - cron: '0 */12 * * *'  # tiap 12 jam (UTC)
 
 permissions:
   contents: read
