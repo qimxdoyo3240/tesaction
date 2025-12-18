@@ -3,7 +3,8 @@ name: Run bash --noTest
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */12 * * *'  # tiap 12 jam (UTC)
+    # 07:00 & 19:00 WIB (UTC+7)
+    - cron: '0 0,12 * * *'
 
 permissions:
   contents: read
@@ -15,16 +16,16 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 300  # 5 jam
+    timeout-minutes: 300
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug (optional)
+      - name: Show WIB time (debug)
         run: |
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          ls -la
+          sudo timedatectl set-timezone Asia/Jakarta
+          date
 
       - name: Run bash
         run: |
